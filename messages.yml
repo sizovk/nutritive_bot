@@ -1,0 +1,6 @@
+welcome_message: |
+  Привет, {name}!
+  Че как дела?
+info_nutrient: |
+  {name} ({symbol})
+  Содержится в следующих продуктах: {found}

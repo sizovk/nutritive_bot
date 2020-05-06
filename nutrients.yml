@@ -1,0 +1,6 @@
+- name: Витамин B12
+  symbol: B12
+  found: В мясе, в таблетках
+- name: Витамин D
+  symbol: D
+  found: В мясе, в солнышке
