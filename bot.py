@@ -10,7 +10,7 @@ nutrients_base = load_yml_file("nutrients.yml")
 
 @bot.message_handler(commands=["start", "help"])
 def welcome_message(message):
-    bot.reply_to(message, messages_base["welcome_message"].format(name="Kirill"))
+    bot.reply_to(message, messages_base["welcome_message"], parse_mode="Markdown")
 
 @bot.message_handler(commands=["all"])
 def all_nutrients(message):
@@ -30,9 +30,14 @@ def info_nutrient(message):
     else:
         bot.reply_to(message, messages_base["no_nutrient_with_given_symbol"])
 
+@bot.message_handler(commands=["sun", "sunny"])
+def with_love(message):
+    bot.reply_to(message, "\u2600\ufe0fБот был придуман и разработан солнечной Саней Морозовой и реализован её добрым коллегой Кириллом Сизовым\u2600\ufe0f")
+
 @bot.message_handler(content_types=["text"])
 def only_text(message):
     bot.reply_to(message, messages_base["no_commands_message"])
+
 
 if __name__ == "__main__":
     bot.infinity_polling()
