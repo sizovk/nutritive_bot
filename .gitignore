@@ -1,4 +1,7 @@
-# Ignore VSCode config
+# Databases
+*.db
+
+# VSCode config
 .vscode
 
 # Created by https://www.gitignore.io/api/python
