@@ -4,6 +4,7 @@ from config import Question, Nutrient
 from db_operations import UsersData
 from yaml_util import load_yml_file
 
+messages_base = load_yml_file("messages.yml")
 nutrients_base = load_yml_file("nutrients.yml")
 
 class NutrientsCalculator:
@@ -17,9 +18,10 @@ class NutrientsCalculator:
             assert(answer)
         if nutrient in self.__dispatcher:
             return self.__dispatcher[nutrient](answers)
-        if "results" in nutrients_base[nutrient] and len(nutrients_base[nutrient]["results"]) == 1:
-            return nutrients_base[nutrient]["results"][0]
-        logging.error("Can't find norm for nutrient {}".format(nutrient))
+        if "results" in nutrients_base[nutrient] and "default" in nutrients_base[nutrient]["results"]:
+            return nutrients_base[nutrient]["results"]["default"]
+        logging.warn("Can't find norm for nutrient {}".format(nutrient))
+        return messages_base["not_added_calculate_func_for_nutrient"]
 
 def vitamin_n(answers):
     cur_results = nutrients_base[Nutrient.N.value]["results"]

@@ -34,3 +34,6 @@ no_data_in_db: |
 
 finish_form_before_start_new_one: |
   Для начала закончите прохождение предыдущего опроса.
+
+not_added_calculate_func_for_nutrient: |
+  Мы еще не добавили возможность вычислить норму потребления для данного нутриента.
