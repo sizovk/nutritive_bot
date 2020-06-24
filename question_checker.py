@@ -53,7 +53,7 @@ def set_next_question(chat_id):
 
 
 def how_old(answer):
-    question_messages = questions_base[Question.HOW_OLD.value]
+    question_messages = questions_base[Question.AGE.value]
     result = convert_to_int(answer)
     if result is None:
         return CheckerResponse(message=question_messages["not_number"])
@@ -61,8 +61,18 @@ def how_old(answer):
         return CheckerResponse(message=question_messages["neg_number"])
     return CheckerResponse(result=result, status=True)
 
+def get_gender(answer):
+    question = questions_base[Question.GENDER.value]
+    if not answer in question["answers"]:
+        return CheckerResponse(message=question["wrong_format"])
+    result = False
+    if answer == question["answers"][0]:
+        result = True
+    return CheckerResponse(result=result, status=True)
+
 question_checker = {
-    Question.HOW_OLD.value: how_old
+    Question.AGE.value: how_old,
+    Question.GENDER.value: get_gender
 }
 
 

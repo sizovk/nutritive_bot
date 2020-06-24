@@ -11,6 +11,7 @@ class NutrientsCalculator:
     def __init__(self):
         self.__dispatcher = {
             Nutrient.N.value: vitamin_n,
+            Nutrient.Se.value: selen
         }
 
     def calculate_norm(self, nutrient, answers):
@@ -25,7 +26,14 @@ class NutrientsCalculator:
 
 def vitamin_n(answers):
     cur_results = nutrients_base[Nutrient.N.value]["results"]
-    if answers[Question.HOW_OLD.value] >= 18:
+    if answers[Question.AGE.value] >= 18:
         return cur_results["adult"]
-    else:
-        return cur_results["child"]
+    return cur_results["child"]
+
+def selen(answers):
+    results = nutrients_base[Nutrient.Se.value]["results"]
+    if answers[Question.AGE.value] < 18:
+        return results["child"]
+    if answers[Question.GENDER.value]:
+        return results["man"]
+    return results["woman"]

@@ -24,17 +24,42 @@ def get_nutrient_norm_result(chat_id):
     if "questions" in nutrients_base[nutrient_name]:
         with UsersData() as db:
             answers = db.get_answers(chat_id, nutrients_base[nutrient_name]["questions"])
-    for answer in answers:
-        if not answer:
-            return messages_base["no_data_in_db"]
+    if answers:
+        for answer in answers.values():
+            if answer is None:
+                with UsersData() as db:
+                    db.set_user_nutrient(chat_id, None)
+                    db.set_user_question_index(chat_id, None)
+                return messages_base["no_data_in_db"]
     result = nutrients_calculator.calculate_norm(nutrient_name, answers)
     with UsersData() as db:
         db.set_user_nutrient(chat_id, None)
         db.set_user_question_index(chat_id, None)
     return result
 
+def ask_question(chat_id):
+    question_name = get_user_question_name(chat_id)
+    assert question_name in questions_base
+    question = questions_base[question_name]
+    if "answers" in question:
+        keyboard = telebot.types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
+        for answer in question["answers"]:
+            button = telebot.types.KeyboardButton(text=answer)
+            keyboard.add(button)
+        try:
+            bot.send_message(chat_id=chat_id, text=question["question_text"], reply_markup=keyboard)
+        except telebot.apihelper.ApiException as e:
+            logging.error(e)
+    else:
+        erase_keyboard = telebot.types.ReplyKeyboardRemove(selective=False)
+        try:
+            bot.send_message(chat_id=chat_id, text=question["question_text"], reply_markup=erase_keyboard)
+        except telebot.apihelper.ApiException as e:
+            logging.error(e)
+
 @bot.message_handler(commands=["start", "help"])
 def welcome_message(message):
+    # TODO: add keyboard markup
     try:
         bot.reply_to(message, messages_base["welcome_message"], parse_mode="Markdown")
     except telebot.apihelper.ApiException as e:
@@ -95,11 +120,8 @@ def handle_calculate_button(call):
             logging.error(e)
     else:
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=messages_base["answer_questions"])
-        first_question = nutrients_base[nutrient_name]["questions"][0]
-        try:
-            bot.send_message(call.message.chat.id, questions_base[first_question]["question_text"])
-        except telebot.apihelper.ApiException as e:
-            logging.error(e)
+        # TODO: make a delay
+        ask_question(chat_id)
 
 @bot.message_handler(func=lambda message: get_user_question_name(message.chat.id))
 def answer_question(message):
@@ -115,15 +137,12 @@ def answer_question(message):
             except telebot.apihelper.ApiException as e:
                 logging.error(e)
         if set_next_question(message.chat.id):
-            new_question = get_user_question_name(message.chat.id)
-            try:
-                bot.send_message(message.chat.id, new_question)
-            except telebot.apihelper.ApiException as e:
-                logging.error(e)
+            ask_question(message.chat.id)
         else:
             result = get_nutrient_norm_result(message.chat.id)
+            erase_keyboard = telebot.types.ReplyKeyboardRemove(selective=False)
             try:
-                bot.send_message(message.chat.id, result)
+                bot.send_message(chat_id=message.chat.id, text=result, reply_markup=erase_keyboard)
             except telebot.apihelper.ApiException as e:
                 logging.error(e)
     elif response.message:
