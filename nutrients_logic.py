@@ -11,7 +11,13 @@ class NutrientsCalculator:
     def __init__(self):
         self.__dispatcher = {
             Nutrient.N.value: vitamin_n,
-            Nutrient.Se.value: selen
+            Nutrient.Se.value: selen,
+            Nutrient.Zn.value: zinc,
+            Nutrient.Mg.value: magnesium,
+            Nutrient.Ca.value: calcium,
+            Nutrient.I.value: iodine,
+            Nutrient.Fe.value: ferrum,
+            Nutrient.C.value: vitamin_c,
         }
 
     def calculate_norm(self, nutrient, answers):
@@ -37,3 +43,102 @@ def selen(answers):
     if answers[Question.GENDER.value]:
         return results["man"]
     return results["woman"]
+
+def zinc(answers):
+    results = nutrients_base[Nutrient.Zn.value]["results"]
+    age = answers[Question.AGE.value]  
+    if age >= 18:
+        if answers[Question.GENDER.value]:
+            return results["man"]
+        else:
+            return results["woman"]
+    elif age < 1:
+        return results["age_0_0"]
+    elif age < 3:
+        return results["age_1_3"]
+    elif age < 7:
+        return results["age_3_7"]
+    elif age < 11:
+        return results["age_7_11"]
+    elif age < 18:
+        return results["age_11_18"]
+
+def magnesium(answers):
+    results = nutrients_base[Nutrient.Mg.value]["results"]
+    age = answers[Question.AGE.value]
+    if age >= 18:
+        if answers[Question.GENDER.value]:
+            return results["man"]
+        else:
+            return results["woman"]
+    elif age < 1:
+        return results["age_0_0"]
+    elif age < 4:
+        return results["age_1_4"]
+    elif age < 7:
+        return results["age_4_7"]
+    elif age < 11:
+        return results["age_7_11"]
+    elif age < 15:
+        return results["age_11_15"]
+    elif age < 18:
+        return results["age_15_18"]
+
+def calcium(answers):
+    results = nutrients_base[Nutrient.Ca.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 1:
+        return results["age_0_0"]
+    elif age < 3:
+        return results["age_1_3"]
+    elif age < 11:
+        return results["age_3_11"]
+    elif age < 18:
+        return results["age_11_18"]
+    elif age < 60:
+        return results["age_18_60"]
+    else:
+        return results["age_60+"]
+
+def iodine(answers):
+    results = nutrients_base[Nutrient.I.value]["results"]
+    age = answers[Question.AGE.value]
+    if age < 6:
+        return results["age_0_6"]
+    elif age < 12:
+        return results["age_6_12"]
+    elif answers[Question.GENDER.value]:
+        return results["man_12+"]
+    else:
+        return results["woman_12+"]
+
+def ferrum(answers):
+    results = nutrients_base[Nutrient.Fe.value]["results"]
+    age = answers[Question.AGE.value]
+    if age < 1:
+        return results["age_0_0"]
+    elif age < 15:
+        return results["age_1_15"]
+    elif age < 18:
+        if answers[Question.GENDER.value]:
+            return results["man_15_18"]
+        else:
+            return results["woman_15_18"]
+    elif answers[Question.GENDER.value]:
+        return results["man_18+"]
+    else:
+        return results["woman_18+"]
+
+def vitamin_c(answers):
+    results = nutrients_base[Nutrient.C.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 15:
+        return results["age_0_15"]
+    elif age < 18:
+        return results["age_15_18"]
+    else:
+        return results["age_18+"]

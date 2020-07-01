@@ -39,7 +39,8 @@ class UsersData:
         self.__db_cursor.execute("""CREATE TABLE IF NOT EXISTS Answers(
             chat_id INTEGER NOT NULL UNIQUE,
             age INTEGER,
-            gender BOOLEAN
+            gender BOOLEAN,
+            pregnant BOOLEAN
         )""")
         # TODO: make update columns
         self.commit()

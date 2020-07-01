@@ -70,9 +70,19 @@ def get_gender(answer):
         result = True
     return CheckerResponse(result=result, status=True)
 
+def is_pregnant(answer):
+    question = questions_base[Question.PREGNANT.value]
+    if not answer in question["answers"]:
+        return CheckerResponse(message=question["wrong_format"])
+    result = False
+    if answer == question["answers"][0]:
+        result = True
+    return CheckerResponse(result=result, status=True)
+
 question_checker = {
     Question.AGE.value: how_old,
-    Question.GENDER.value: get_gender
+    Question.GENDER.value: get_gender,
+    Question.PREGNANT.value: is_pregnant
 }
 
 
