@@ -7,6 +7,8 @@ class Question(enum.Enum):
     AGE = "age"
     GENDER = "gender"
     PREGNANT = "pregnant"
+    SPORT = "sport"
+    WEIGHT = "weight"
 
 class Nutrient(enum.Enum):
     Al = "Al"
@@ -40,7 +42,7 @@ class Nutrient(enum.Enum):
     U = "U"
     V = "V"
     VK = "VK"
-    VР = "VР"
+    VP = "VP"
     Zn = "Zn"
     A = "A"
     B13 = "B13"

@@ -18,6 +18,8 @@ class NutrientsCalculator:
             Nutrient.I.value: iodine,
             Nutrient.Fe.value: ferrum,
             Nutrient.C.value: vitamin_c,
+            Nutrient.VP.value: vitamin_p,
+            Nutrient.E.value: vitamin_e
         }
 
     def calculate_norm(self, nutrient, answers):
@@ -142,3 +144,20 @@ def vitamin_c(answers):
         return results["age_15_18"]
     else:
         return results["age_18+"]
+
+def vitamin_p(answers):
+    results = nutrients_base[Nutrient.VP.value]["results"]
+    if answers[Question.SPORT.value]:
+        return results["sport"]
+    elif answers[Question.AGE.value] < 18:
+        return results["child"]
+    else:
+        return results["adult"]
+
+def vitamin_e(answers):
+    template = nutrients_base[Nutrient.E.value]["results"]["template"]
+    if answers[Question.AGE.value] == 0:
+        norm = answers[Question.WEIGHT.value] * 0.5
+    else:
+        norm = answers[Question.WEIGHT.value] * 0.3
+    return template.format(count=norm)

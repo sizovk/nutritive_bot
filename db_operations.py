@@ -40,7 +40,9 @@ class UsersData:
             chat_id INTEGER NOT NULL UNIQUE,
             age INTEGER,
             gender BOOLEAN,
-            pregnant BOOLEAN
+            pregnant BOOLEAN,
+            sport BOOLEAN,
+            weight REAL
         )""")
         # TODO: make update columns
         self.commit()
