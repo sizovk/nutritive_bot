@@ -47,7 +47,7 @@ class Nutrient(enum.Enum):
     A = "A"
     B13 = "B13"
     B2 = "B2"
-    В3 = "В3"
+    B3 = "B3"
     B4 = "B4"
     B6 = "B6"
     B8 = "B8"

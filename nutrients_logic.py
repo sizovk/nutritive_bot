@@ -19,7 +19,11 @@ class NutrientsCalculator:
             Nutrient.Fe.value: ferrum,
             Nutrient.C.value: vitamin_c,
             Nutrient.VP.value: vitamin_p,
-            Nutrient.E.value: vitamin_e
+            Nutrient.E.value: vitamin_e,
+            Nutrient.B9.value: vitamin_b9,
+            Nutrient.B4.value: vitamin_b4,
+            Nutrient.B6.value: vitamin_b6,
+            Nutrient.B3.value: vitamin_b3,
         }
 
     def calculate_norm(self, nutrient, answers):
@@ -161,3 +165,55 @@ def vitamin_e(answers):
     else:
         norm = answers[Question.WEIGHT.value] * 0.3
     return template.format(count=norm)
+
+def vitamin_b9(answers):
+    results = nutrients_base[Nutrient.B9.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 1:
+        return results["age_0_1"]
+    elif age < 3:
+        return results["age_1_3"]
+    elif age < 11:
+        return results["age_3_11"]
+    elif age < 14:
+        return results["age_11_14"]
+    else:
+        return results["age_14+"]
+
+def vitamin_b4(answers):
+    results = nutrients_base[Nutrient.B4.value]["results"]
+    age = answers[Question.AGE.value]
+    if age < 1:
+        return results["age_0_1"]
+    elif age < 3:
+        return results["age_1_3"]
+    elif age < 7:
+        return results["age_3_7"]
+    elif age < 18:
+        return results["age_7_18"]
+    else:
+        return results["age_18+"]
+
+def vitamin_b6(answers):
+    results = nutrients_base[Nutrient.B6.value]["results"]
+    age = answers[Question.AGE.value]
+    if age < 1:
+        return results["age_0_1"]
+    elif age < 6:
+        return results["age_1_6"]
+    elif age < 10:
+        return results["age_6_10"]
+    else:
+        return results["age_10+"]
+
+def vitamin_b3(answers):
+    results = nutrients_base[Nutrient.B3.value]["results"]
+    age = answers[Question.AGE.value]
+    if age < 1:
+        return results["age_0_1"]
+    elif age < 6:
+        return results["age_1_6"]
+    else:
+        return results["age_6+"]
