@@ -24,6 +24,11 @@ class NutrientsCalculator:
             Nutrient.B4.value: vitamin_b4,
             Nutrient.B6.value: vitamin_b6,
             Nutrient.B3.value: vitamin_b3,
+            Nutrient.B2.value: vitamin_b2,
+            Nutrient.B1.value: vitamin_b1,
+            Nutrient.A.value: vitamin_a,
+            Nutrient.L.value: l_karnitin,
+            Nutrient.VK.value: vitamin_k,
         }
 
     def calculate_norm(self, nutrient, answers):
@@ -217,3 +222,86 @@ def vitamin_b3(answers):
         return results["age_1_6"]
     else:
         return results["age_6+"]
+
+def vitamin_b2(answers):
+    results = nutrients_base[Nutrient.B2.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 1:
+        return results["age_0_1"]
+    elif age < 4:
+        return results["age_1_4"]
+    elif age < 9:
+        return results["age_4_9"]
+    elif age < 14:
+        if answers[Question.GENDER.value]:
+            return results["man_9_14"]
+        else:
+            return results["woman_9_14"]
+    else:
+        if answers[Question.GENDER.value]:
+            return results["man_14+"]
+        else:
+            return results["woman_14+"]
+
+def vitamin_b1(answers):
+    results = nutrients_base[Nutrient.B1.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 3:
+        return results["age_0_3"]
+    elif age < 14:
+        return results["age_3_14"]
+    elif age < 18:
+        return results["age_14_18"]
+    elif age < 50:
+        if answers[Question.GENDER.value]:
+            return results["man_18_50"]
+        else:
+            return results["woman_18_50"]
+    else:
+        return results["age_50+"]
+
+def vitamin_a(answers):
+    results = nutrients_base[Nutrient.A.value]["results"]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    if answers[Question.AGE.value] < 18:
+        return results["child"]
+    if answers[Question.GENDER.value]:
+        return results["man"]
+    return results["woman"]
+
+def l_karnitin(answers):
+    results = nutrients_base[Nutrient.L.value]["results"]
+    age = answers[Question.AGE.value]
+    if age < 1:
+        return results["age_0_1"]
+    elif age < 4:
+        return results["age_1_4"]
+    elif age < 7:
+        return results["age_4_7"]
+    elif age < 18:
+        return results["age_7_18"]
+    elif answers[Question.SPORT.value]:
+        return results["sport"]
+    else:
+        return results["age_18+"]
+
+def vitamin_k(answers):
+    results = nutrients_base[Nutrient.VK.value]["results"]
+    age = answers[Question.AGE.value]
+    if age < 1:
+        return results["age_0_1"]
+    if age < 4:
+        return results["age_1_4"]
+    if age < 9:
+        return results["age_4_9"]
+    if age < 14:
+        return results["age_9_14"]
+    if age < 19:
+        return results["age_14_19"]
+    else:
+        return results["age_19+"]    
