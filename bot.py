@@ -64,10 +64,22 @@ def get_main_keyboard():
     keyboard.add(nutrients_list_button, about_us_button)
     return keyboard
 
+def get_nutrients_list_keyboard():
+    width = messages_base["list_nutrients_row_width"]
+    keyboard = telebot.types.InlineKeyboardMarkup(row_width=width)
+    nutrients = [(nutr["name"], nutr["symbol"]) for nutr in nutrients_base.values()]
+    buttons = []
+    for nutrient in nutrients:
+        cur_button = telebot.types.InlineKeyboardButton(text=nutrient[0], callback_data=nutrient[1])
+        buttons.append(cur_button)
+    keyboard.add(*buttons)
+    return keyboard    
+
 @bot.message_handler(commands=["start", "help"])
 def welcome_message(message):
     try:
-        bot.reply_to(message, messages_base["welcome_message"], parse_mode="Markdown", reply_markup=get_main_keyboard())
+        bot.send_message(message.chat.id, messages_base["welcome_message"], parse_mode="Markdown", reply_markup=get_main_keyboard())
+        bot.send_message(message.chat.id, messages_base["warning_message"], parse_mode="Markdown", reply_markup=get_main_keyboard())
     except telebot.apihelper.ApiException as e:
         logging.error(e)
 
@@ -77,10 +89,24 @@ def handle_nutrient_click(call):
     keyboard = telebot.types.InlineKeyboardMarkup()
     info_button = telebot.types.InlineKeyboardButton(text=messages_base["info_button"], callback_data="info {}".format(nutrient))
     calculate_button = telebot.types.InlineKeyboardButton(text=messages_base["calculate_button"], callback_data="calculate {}".format(nutrient))
+    back_button = telebot.types.InlineKeyboardButton(text=messages_base["back_to_list_button"], callback_data="back_to_list")
     keyboard.add(info_button)
     keyboard.add(calculate_button)
+    keyboard.add(back_button)
     try:
         bot.edit_message_text(text=messages_base["clicked_nutrient_text"].format(name=nutrients_base[nutrient]["name"]), chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=keyboard)
+    except telebot.apihelper.ApiException as e:
+        logging.error(e)
+
+@bot.callback_query_handler(lambda call: call.data == "back_to_list") 
+def handle_back_to_list(call):
+    try:
+        bot.edit_message_text(
+            chat_id=call.message.chat.id,
+            message_id=call.message.message_id,
+            text=messages_base["nutrients_list"],
+            reply_markup=get_nutrients_list_keyboard()
+        )
     except telebot.apihelper.ApiException as e:
         logging.error(e)
 
@@ -88,10 +114,13 @@ def handle_nutrient_click(call):
 def handle_info_button(call):
     nutrient_name = call.data[len("info "):]
     assert nutrient_name in nutrients_base
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    back_button = telebot.types.InlineKeyboardButton(text=messages_base["back_to_nutrient"], callback_data=nutrient_name)
+    keyboard.add(back_button)
     nutrient = nutrients_base[nutrient_name]
     info_text = messages_base["info_nutrient"].format(name=nutrient["name"], produced=nutrient["produced"], properties=nutrient["properties"])
     try:
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=info_text)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=info_text, reply_markup=keyboard)
     except telebot.apihelper.ApiException as e:
         logging.error(e)
 
@@ -104,16 +133,23 @@ def handle_calculate_button(call):
         db.set_user_question_index(chat_id=chat_id, question_index=0)
     if (not "questions" in nutrients_base[nutrient_name]) or len(nutrients_base[nutrient_name]["questions"]) == 0:
         result = get_nutrient_norm_result(chat_id)
+        keyboard = telebot.types.InlineKeyboardMarkup()
+        back_button = telebot.types.InlineKeyboardButton(text=messages_base["back_to_nutrient"], callback_data=nutrient_name)
+        keyboard.add(back_button)
         try:
             bot.edit_message_text(
                 chat_id=call.message.chat.id, 
                 message_id=call.message.message_id, 
-                text=result
+                text=result,
+                reply_markup=keyboard
             )
         except telebot.apihelper.ApiException as e:
             logging.error(e)
     else:
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=messages_base["answer_questions"])
+        try:
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=messages_base["answer_questions"])
+        except telebot.apihelper.ApiException as e:
+            logging.error(e)
         ask_question(chat_id)
 
 @bot.message_handler(func=lambda message: get_user_question_name(message.chat.id))
@@ -145,22 +181,14 @@ def answer_question(message):
 
 @bot.message_handler(func=lambda message: message.text == messages_base["nutrients_list_button"])
 def list_nutrients(message):
-    width = messages_base["list_nutrients_row_width"]
-    keyboard = telebot.types.InlineKeyboardMarkup(row_width=width)
-    nutrients = [(nutr["name"], nutr["symbol"]) for nutr in nutrients_base.values()]
-    buttons = []
-    for nutrient in nutrients:
-        cur_button = telebot.types.InlineKeyboardButton(text=nutrient[0], callback_data=nutrient[1])
-        buttons.append(cur_button)
-    keyboard.add(*buttons)
     try:
-        bot.send_message(chat_id=message.chat.id, text=messages_base["nutrients_list"], reply_markup=keyboard)
+        bot.send_message(chat_id=message.chat.id, text=messages_base["nutrients_list"], reply_markup=get_nutrients_list_keyboard())
     except telebot.apihelper.ApiException as e:
         logging.error(e)
 
 @bot.message_handler(func=lambda message: message.text == messages_base["about_us_button"])
 def about_us(message):
-    bot.send_message(chat_id=message.chat.id, text=messages_base["about_us"])
+    bot.send_message(chat_id=message.chat.id, text=messages_base["about_us"], parse_mode="Markdown")
 
 @bot.message_handler(commands=["sun", "sunny"])
 def with_love(message):

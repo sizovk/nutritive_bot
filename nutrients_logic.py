@@ -29,6 +29,9 @@ class NutrientsCalculator:
             Nutrient.A.value: vitamin_a,
             Nutrient.L.value: l_karnitin,
             Nutrient.VK.value: vitamin_k,
+            Nutrient.B13.value: vitamin_b13,
+            Nutrient.B12.value: vitamin_b12,
+            Nutrient.D.value: vitamin_d
         }
 
     def calculate_norm(self, nutrient, answers):
@@ -305,3 +308,47 @@ def vitamin_k(answers):
         return results["age_14_19"]
     else:
         return results["age_19+"]    
+
+def vitamin_b13(answers):
+    results = nutrients_base[Nutrient.B13.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 1:
+        return results["age_0_1"]
+    elif age < 3:
+        return results["age_1_3"]
+    elif age < 8:
+        return results["age_3_8"]
+    else:
+        return results["age_8+"]
+
+def vitamin_b12(answers):
+    results = nutrients_base[Nutrient.B12.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 1:
+        return results["age_0_1"]
+    elif age < 4:
+        return results["age_1_4"]
+    elif age < 9:
+        return results["age_4_9"]
+    elif age < 14:
+        return results["age_9_14"]
+    else:
+        return results["age_14+"]
+
+def vitamin_d(answers):
+    results = nutrients_base[Nutrient.D.value]["results"]
+    age = answers[Question.AGE.value]
+    if answers[Question.PREGNANT.value]:
+        return results["pregnant"]
+    elif age < 1:
+        return results["age_0_1"]
+    elif age < 14:
+        return results["age_1_14"]
+    elif age < 71:
+        return results["age_14_71"]
+    else:
+        return results["age_71+"]
