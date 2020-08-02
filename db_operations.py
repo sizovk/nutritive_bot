@@ -1,10 +1,9 @@
 import logging
 import sqlite3
 
-import config
 
 class UsersData:
-    def __init__(self, db_location=config.DB_LOCATION):
+    def __init__(self, db_location):
         self.__DB_LOCATION = db_location
         self.__db_connection = sqlite3.connect(self.__DB_LOCATION)
         self.__db_cursor = self.__db_connection.cursor()
@@ -44,7 +43,6 @@ class UsersData:
             sport BOOLEAN,
             weight REAL
         )""")
-        # TODO: make update columns
         self.commit()
 
     def __insert_user_if_not_in_db(self, chat_id):

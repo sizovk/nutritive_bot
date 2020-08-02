@@ -10,6 +10,7 @@ class Question(enum.Enum):
     SPORT = "sport"
     WEIGHT = "weight"
 
+
 class Nutrient(enum.Enum):
     Al = "Al"
     B = "B"
