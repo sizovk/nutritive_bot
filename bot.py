@@ -6,7 +6,7 @@ import time
 
 from db_operations import UsersData
 from nutrients_logic import NutrientsCalculator
-from question_checker import get_user_question_name, set_next_question, question_checker
+from question_checker import question_checker
 from yaml_util import load_yml_file
 
 
@@ -33,6 +33,45 @@ if __name__ == "__main__":
     logging.info("Configs successfully loaded")
 
     nutrients_calculator = NutrientsCalculator()
+
+
+def get_user_question_name(chat_id):
+    with UsersData(DB_LOCATION) as db:
+        nutrient = db.get_user_nutrient(chat_id)
+        question_ind = db.get_user_question_index(chat_id)
+    if (nutrient is None) or (question_ind is None):
+        return None
+    if nutrient not in nutrients_base:
+        logging.error("There is no nutrients with name {} in base".format(nutrient))
+        return None 
+    if not "questions" in nutrients_base[nutrient]:
+        return None
+    if question_ind < 0 or question_ind >= len(nutrients_base[nutrient]["questions"]):
+        logging.error("Invalid question index {} for nutrient {}".format(question_ind, nutrient))
+        return None
+    return nutrients_base[nutrient]["questions"][question_ind]
+
+
+def set_next_question(chat_id):
+    with UsersData(DB_LOCATION) as db:
+        nutrient = db.get_user_nutrient(chat_id)
+        question_ind = db.get_user_question_index(chat_id)
+        if (nutrient is None) or (question_ind is None):
+            logging.warn("Trying to set next question for user with current nutrient: {} and with question index: {}".format(nutrient, question_ind))
+            return None
+        if nutrient not in nutrients_base:
+            logging.error("There is no nutrients with name {} in base".format(nutrient))
+            return None 
+        if not "questions" in nutrients_base[nutrient]:
+            return None
+        if question_ind < 0 or question_ind >= len(nutrients_base[nutrient]["questions"]):
+            logging.warn("Trying to set next question with incorrect index {} for nutrient {}".format(question_ind, nutrient))
+            return None
+        question_ind += 1
+        if question_ind < len(nutrients_base[nutrient]["questions"]):
+            db.set_user_question_index(chat_id, question_ind)
+            return True
+        return False
 
 
 def get_nutrient_norm_result(chat_id):

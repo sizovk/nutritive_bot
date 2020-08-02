@@ -1,7 +1,5 @@
 import enum
 
-DB_LOCATION = "users.db"  # TODO: make another way to get location
-
 
 class Question(enum.Enum):
     AGE = "age"
