@@ -8,7 +8,7 @@ from db_operations import UsersData
 from nutrients_logic import NutrientsCalculator
 from question_checker import question_checker
 from yaml_util import load_yml_file
-
+import config
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Telergram bot for calculate nutrients norm")
@@ -72,16 +72,18 @@ def set_next_question(chat_id):
         if question_ind < len(nutrients_base[nutrient]["questions"]):
             db.set_user_question_index(chat_id, question_ind)
 
-            # skiping pregnant question if man`s gender is male
-            cur_question_name = get_user_question_name(chat_id)
-            if cur_question_name == 'pregnant':
-                gender = db.get_answers(chat_id, ['gender'])['gender']
-                if gender and gender == 1:
-                    db.set_answer(chat_id, 'pregnant', 0)
+            questions_has_gender = config.Question.GENDER.value in nutrients_base[nutrient]['questions']
+            gender = db.get_answers(chat_id, [config.Question.GENDER.value])[config.Question.GENDER.value]
+
+            cur_question_name = nutrients_base[nutrient]['questions'][db.get_user_question_index(chat_id)]
+            if cur_question_name == config.Question.PREGNANT.value:
+                # skip pregnant question
+                if gender is not None and gender == 1 and questions_has_gender:
+                    db.set_answer(chat_id, config.Question.PREGNANT.value, 0)
                     question_ind += 1
-                    if question_ind < 0 or question_ind >= len(nutrients_base[nutrient]["questions"]):
-                        return None
-                    db.set_user_question_index(chat_id, question_ind)
+                if question_ind < 0 or question_ind >= len(nutrients_base[nutrient]["questions"]):
+                    return None
+                db.set_user_question_index(chat_id, question_ind)
             return True
         return False
 
