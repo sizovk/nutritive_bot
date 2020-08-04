@@ -72,7 +72,7 @@ def set_next_question(chat_id):
         if question_ind < len(nutrients_base[nutrient]["questions"]):
             db.set_user_question_index(chat_id, question_ind)
 
-            questions_has_gender = 'gender' in nutrients_base[nutrient]['questions']
+            questions_has_gender = config.Question.GENDER.value in nutrients_base[nutrient]['questions']
             gender = db.get_answers(chat_id, [config.Question.GENDER.value])[config.Question.GENDER.value]
 
             cur_question_name = nutrients_base[nutrient]['questions'][db.get_user_question_index(chat_id)]
