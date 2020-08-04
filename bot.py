@@ -53,6 +53,7 @@ def get_user_question_name(chat_id):
 
 
 def set_next_question(chat_id):
+    # here
     with UsersData(DB_LOCATION) as db:
         nutrient = db.get_user_nutrient(chat_id)
         question_ind = db.get_user_question_index(chat_id)
@@ -70,6 +71,17 @@ def set_next_question(chat_id):
         question_ind += 1
         if question_ind < len(nutrients_base[nutrient]["questions"]):
             db.set_user_question_index(chat_id, question_ind)
+
+            # skiping pregnant question if man`s gender is male
+            cur_question_name = get_user_question_name(chat_id)
+            if cur_question_name == 'pregnant':
+                gender = db.get_answers(chat_id, ['gender'])['gender']
+                if gender and gender == 1:
+                    db.set_answer(chat_id, 'pregnant', 0)
+                    question_ind += 1
+                    if question_ind < 0 or question_ind >= len(nutrients_base[nutrient]["questions"]):
+                        return None
+                    db.set_user_question_index(chat_id, question_ind)
             return True
         return False
 
